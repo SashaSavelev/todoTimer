@@ -48,8 +48,18 @@ const todosSlice = createSlice({
       const { userId, todoId } = action.payload;
       state[userId] = state[userId].filter((t) => t.id !== todoId);
     },
+    incrementElapsedTime(
+      state,
+      action: PayloadAction<{ userId: string; todoId: string }>
+    ) {
+      const { userId, todoId } = action.payload;
+      const todo = state[userId].find((t) => t.id === todoId);
+      if (todo && todo.currentlyWorking) {
+        todo.elapsedTime += 1000; 
+      }
+    },
   },
 });
 
-export const { addTodo, toggleTodo, removeTodo } = todosSlice.actions;
+export const { addTodo, toggleTodo, removeTodo, incrementElapsedTime } = todosSlice.actions;
 export default todosSlice.reducer;

@@ -4,10 +4,13 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        'blue': '#547CFB',
+      },
       fontFamily: {
         sans: ['Roboto', 'ui-sans-serif', 'system-ui'],
       },
     },
   },
   plugins: [],
-}
+};
