@@ -54,8 +54,8 @@ const CompletedTodos: React.FC<Props> = ({ todos = [], toggleRemoveTodo, toggleR
     }));
 
     return (
-        <div ref={drop} className={`flex flex-col pt-9 ${isOver ? 'bg-greyish' : ''}`}>
-            <div className="grid grid-cols-3">
+        <div ref={drop} className={`flex flex-col pt-9  ${isOver ? 'bg-greyish' : ''}`}>
+            <div className="grid grid-cols-3 ">
                 <div className="flex justify-start  py-2 text-white text-2xl">Сегодня</div>
                 <div className="w-1/5"></div>
                 <div className="flex justify-end  py-2 w-full text-blue text-2xl">{totalTime}</div>
@@ -64,7 +64,7 @@ const CompletedTodos: React.FC<Props> = ({ todos = [], toggleRemoveTodo, toggleR
 
             {completedTodos.map((todo, index) => (
                 <React.Fragment key={todo.id}>
-                    <div className="grid grid-cols-3">
+                    <div className="grid grid-cols-3 hover:bg-dark-grey">
                         <div className=" py-4 w-1/2 text-light-grey">
                             <s>{todo.text}</s>
                         </div>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Todo } from '../redux/slices/todoSlice';
-import { incrementElapsedTime } from '../redux/slices/todoSlice';
+import { Todo, incrementElapsedTime } from '../redux/slices/todoSlice';
 import { useDrag, DragSourceMonitor } from 'react-dnd';
+import { Popup } from './Popup';
 
 interface Props {
   todo: Todo;
@@ -16,6 +16,12 @@ const ItemTypes = {
 
 const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) => {
   const dispatch = useDispatch();
+  const [showPopup, setShowPopup] = useState(false);
+  const [localElapsedTime, setLocalElapsedTime] = useState(todo.elapsedTime);
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -31,6 +37,10 @@ const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) =
     };
   }, [dispatch, userId, todo]);
 
+  useEffect(() => {
+    setLocalElapsedTime(todo.elapsedTime);
+  }, [todo.elapsedTime]);
+
   const formatTime = (time: number): string => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
@@ -39,7 +49,14 @@ const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) =
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.TODO_WITH_TIMER,
-    item: { id: todo.id }, 
+    item: { id: todo.id },
+    canDrag: () => {      
+      if (localElapsedTime <= 10000) {
+        setShowPopup(true);
+        return false;
+      }
+      return true;
+    },
     collect: (monitor: DragSourceMonitor) => ({
       isDragging: !!monitor.isDragging()
     })
@@ -65,19 +82,19 @@ const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) =
   const startTimeFormatted = startTime ? new Date(startTime).toLocaleTimeString() : '';
 
   return (
-   
-      <div className="flex flex-col">    
-          <div ref={drag} className={`${isDragging ? "opacity-15" : "opacity-100"} grid grid-cols-3 `}>
-            <div className="py-4 w-1/2 text-light-grey">{todo.text}</div>
-            <div className="py-4 w-full text-right  text-white">
-              {startTimeFormatted.substr(0, 5)} - {currentTimeFormatted.substr(0, 5)}
-            </div>
-            <div className="py-4 w-full  flex justify-end  text-blue">{elapsedTimeFormatted}</div>
-            <hr className="w-full border-t border-light-grey" style={{ gridColumn: "1 / span 3" }} />
+    <>
+      <div className="flex flex-col hover:bg-dark-grey">
+        <div ref={drag} className={`${isDragging ? "opacity-15" : "opacity-100"} grid grid-cols-3`}>
+          <div className="py-4 w-1/2 text-light-grey">{todo.text}</div>
+          <div className="py-4 w-full text-right text-white">
+            {startTimeFormatted.substr(0, 5)} - {currentTimeFormatted.substr(0, 5)}
           </div>
-      
+          <div className="py-4 w-full flex justify-end text-blue">{elapsedTimeFormatted}</div>
+          <hr className="w-full border-t border-light-grey" style={{ gridColumn: "1 / span 3" }} />
+        </div>
       </div>
-  
+      {showPopup && <Popup message="Задачи длительностью менее 10 секунд не сохраняюся" onClose={handleClosePopup} />}
+    </>
   );
 };
 

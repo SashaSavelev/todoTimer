@@ -20,7 +20,7 @@ const CurrentTodos: React.FC<Props> = ({ todos = [], toggleRemove, onComplete })
     };
 
     return (
-        <div className="flex flex-col ">
+        <div className="flex flex-col  ">
             {todos.map(todo => (
                 <TodoItem key={todo.id} todo={todo} onDragEnd={() => handleDragEnd(todo)} />
             ))}
@@ -45,7 +45,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDragEnd }) => {
     return (
         <>
            
-            <div ref={drag} className={`grid grid-cols-3 ${isDragging ? 'opacity-15' : 'opacity-100'}`}>
+            <div ref={drag} className={`grid grid-cols-3 hover:bg-dark-grey ${isDragging ? 'opacity-15' : 'opacity-100'}`}>
                 <div className=" py-4 w-1/2 text-light-grey">{todo.text}</div>
                 <div className=" py-4 w-1/2  text-white"></div>
                 <div className=" py-4 w-1/2 text-blue  "></div>
