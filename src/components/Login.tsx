@@ -35,7 +35,7 @@ const Login: React.FC = () => {
         <div className="mb-4">
           <input
             id="password"
-            type="password"
+            type="text"
             placeholder="Пароль"
             className="w-full px-3 py-2 mb-4 text-white bg-gray-800 border border-gray-700 rounded focus:outline-none hover:border-gray-500 focus:border-blue-500"
             value={password}
