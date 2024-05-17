@@ -6,7 +6,7 @@ export interface Todo {
   completed: boolean;
   withTimer?: boolean;
   currentlyWorking?: boolean;
-  startTime?: number | null; // Изменяем тип данных на number для хранения timestamp
+  startTime?: number | null; 
   elapsedTime: number;
 }
 
@@ -58,8 +58,29 @@ const todosSlice = createSlice({
         todo.elapsedTime += 1000; 
       }
     },
+    completeTodo(
+      state,
+      action: PayloadAction<{ userId: string; todoId: string }>
+    ) {
+      const { userId, todoId } = action.payload;
+      const todo = state[userId].find((t) => t.id === todoId);
+      if (todo) {
+      todo.completed = true;
+      }
+    },
+    completeTodoWithTimer(
+      state,
+      action: PayloadAction<{ userId: string; todoId: string }>
+    ) {
+      const { userId, todoId } = action.payload;
+      const todo = state[userId].find((t) => t.id === todoId);
+      if (todo) {
+          todo.completed = true;
+          todo.currentlyWorking = false;
+      }
+  },
   },
 });
 
-export const { addTodo, toggleTodo, removeTodo, incrementElapsedTime } = todosSlice.actions;
+export const { addTodo, toggleTodo, removeTodo, incrementElapsedTime, completeTodo, completeTodoWithTimer } = todosSlice.actions;
 export default todosSlice.reducer;

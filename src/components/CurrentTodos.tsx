@@ -1,34 +1,58 @@
 import React from 'react';
-import { Todo } from '../redux/slices/todoSlice';
+import { useDrag, DragSourceMonitor } from 'react-dnd';
+import type { Todo } from '../redux/slices/todoSlice';
 
 interface Props {
-  todos: Todo[];
-  toggleRemove: (todoId: string) => void;
+    todos: Todo[];
+    toggleRemove: (todoId: string) => void;
+    onComplete: (todoId: string) => void;
 }
 
-const CurrentTodos: React.FC<Props> = ({ todos = [], toggleRemove }) => {
-  
-  const filteredTodos = todos.filter(
-    (todo) => !todo.withTimer && !todo.completed
-  );
+const ItemTypes = {
+    CURRENT_TODO: 'current_todo',
+};
 
-  return (
-    <div className="flex flex-col">
-      <table className="border-collapse border border-gray-400">
-        <tbody>
-          {filteredTodos.map((todo) => (
-            <tr key={todo.id}>
-              <td className="border border-gray-400 px-4 py-2 text-white">{todo.text}</td>
-              <td className="border border-gray-400 px-4 py-2 text-white"></td>
-              <td className="border border-gray-400 px-4 py-2 text-white">
-                <button onClick={() => toggleRemove(todo.id)}>Remove</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+const CurrentTodos: React.FC<Props> = ({ todos = [], toggleRemove, onComplete }) => {
+    const handleDragEnd = (todo: Todo) => {
+        if (!todos.find(t => t.id === todo.id)) {
+            onComplete(todo.id);
+        }
+    };
+
+    return (
+        <div className="flex flex-col ">
+            {todos.map(todo => (
+                <TodoItem key={todo.id} todo={todo} onDragEnd={() => handleDragEnd(todo)} />
+            ))}
+        </div>
+    );
+};
+
+interface TodoItemProps {
+    todo: Todo;
+    onDragEnd: () => void;
+}
+
+const TodoItem: React.FC<TodoItemProps> = ({ todo, onDragEnd }) => {
+    const [{ isDragging }, drag] = useDrag(() => ({
+        type: ItemTypes.CURRENT_TODO,
+        item: { id: todo.id },
+        collect: (monitor: DragSourceMonitor) => ({
+            isDragging: !!monitor.isDragging(),
+        }),
+    }));
+
+    return (
+        <>
+           
+            <div ref={drag} className={`grid grid-cols-3 ${isDragging ? 'opacity-15' : 'opacity-100'}`}>
+                <div className=" py-4 w-1/2 text-light-grey">{todo.text}</div>
+                <div className=" py-4 w-1/2  text-white"></div>
+                <div className=" py-4 w-1/2 text-blue  "></div>
+                <hr className="w-full border-t border-light-grey" style={{ gridColumn: '1 / span 3' }} />
+            </div>
+        </>
+    );
 };
 
 export default CurrentTodos;

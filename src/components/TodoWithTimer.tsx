@@ -2,15 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Todo } from '../redux/slices/todoSlice';
 import { incrementElapsedTime } from '../redux/slices/todoSlice';
+import { useDrag, DragSourceMonitor } from 'react-dnd';
 
 interface Props {
   todo: Todo;
-  onToggleTodo: (todoId: string) => void;
-  onRemoveTodo: (todoId: string) => void;
   userId: string;
+  onCompleteWithTimer: (todoId: string) => void;
 }
 
-const TodoWithTimer: React.FC<Props> = ({ todo, onToggleTodo, onRemoveTodo, userId }) => {
+const ItemTypes = {
+  TODO_WITH_TIMER: 'todo_with_timer'
+};
+
+const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -33,13 +37,13 @@ const TodoWithTimer: React.FC<Props> = ({ todo, onToggleTodo, onRemoveTodo, user
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
-  const handleToggleTodo = () => {
-    onToggleTodo(todo.id);
-  };
-
-  const handleRemoveTodo = () => {
-    onRemoveTodo(todo.id);
-  };
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: ItemTypes.TODO_WITH_TIMER,
+    item: { id: todo.id }, 
+    collect: (monitor: DragSourceMonitor) => ({
+      isDragging: !!monitor.isDragging()
+    })
+  }));
 
   const [currentTime, setCurrentTime] = useState<number>(Date.now());
 
@@ -55,30 +59,25 @@ const TodoWithTimer: React.FC<Props> = ({ todo, onToggleTodo, onRemoveTodo, user
 
   const startTime = todo.startTime;
   const elapsedTime = startTime ? Math.floor((currentTime - startTime) / 1000) : 0;
-  const minutes = Math.floor(elapsedTime / 60);
-  const seconds = elapsedTime % 60;
-  const elapsedTimeFormatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  const elapsedTimeFormatted = formatTime(elapsedTime);
 
   const currentTimeFormatted = new Date(currentTime).toLocaleTimeString();
   const startTimeFormatted = startTime ? new Date(startTime).toLocaleTimeString() : '';
 
   return (
-<div className="flex flex-col">
-  <table className="border-collapse border border-gray-400">  
-    <tbody>
-      <tr>
-        <td className="border border-gray-400 px-4 py-2 w-1/2 text-white">{todo.text}</td>
-        <td className="border border-gray-400 px-4 py-2 w-1/5 text-center text-white">
-          {startTimeFormatted.substr(0, 5)} - {currentTimeFormatted.substr(0, 5)}
-        </td>
-        <td className="border border-gray-400 px-4 py-2 w-1/5 text-right text-blue">{elapsedTimeFormatted}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-
-    
+   
+      <div className="flex flex-col">    
+          <div ref={drag} className={`${isDragging ? "opacity-15" : "opacity-100"} grid grid-cols-3 `}>
+            <div className="py-4 w-1/2 text-light-grey">{todo.text}</div>
+            <div className="py-4 w-full text-right  text-white">
+              {startTimeFormatted.substr(0, 5)} - {currentTimeFormatted.substr(0, 5)}
+            </div>
+            <div className="py-4 w-full  flex justify-end  text-blue">{elapsedTimeFormatted}</div>
+            <hr className="w-full border-t border-light-grey" style={{ gridColumn: "1 / span 3" }} />
+          </div>
+      
+      </div>
+  
   );
 };
 

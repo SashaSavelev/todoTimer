@@ -46,18 +46,20 @@ const TodoInput: React.FC = () => {
       console.log("Only one active timer allowed at a time.");
     }
   }
+  setTodoText(''); 
+
 };
 
   return (
-    <div className="flex mb-4 w-full">
-      <div className="flex items-center mb-2 flex-grow">
-        <input
-          type="text"
-          value={todoText}
-          onChange={(e) => setTodoText(e.target.value)}
-          className="flex-grow px-3 py-2 mr-2 text-black bg-gray-200 border border-gray-400 rounded focus:outline-none focus:border-blue-500"
-          placeholder="New Todo"
-        />
+    <div className="flex items-center mb-4 w-full">
+      <div className="flex items-center bg-dark-grey rounded flex-grow">
+      <input
+  type="text"
+  value={todoText}
+  onChange={(e) => setTodoText(e.target.value)}
+  className="flex-grow px-3 py-2 mr-2 text-white bg-dark-grey border-none rounded focus:outline-none"
+  placeholder=""
+/>
        <button
   onClick={handleAddTodo}
   className="flex items-center justify-center px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 group"
