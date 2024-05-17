@@ -61,7 +61,7 @@ const TodoList: React.FC = () => {
         <TodoWithTimer
           key={activeTimerTodo.id}
           todo={activeTimerTodo}
-          onCompleteWithTimer={handleCompleteTodoWithTimer} // Изменили вот здесь
+          onCompleteWithTimer={handleCompleteTodoWithTimer} 
           userId={user?.userId || ''}
         />
       )}

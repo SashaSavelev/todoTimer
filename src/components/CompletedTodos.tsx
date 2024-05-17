@@ -17,20 +17,17 @@ const CompletedTodos: React.FC<Props> = ({ todos = [], toggleRemoveTodo, toggleR
     const completedTodos = todos.filter(todo => todo.completed).reverse();
     const todosWithTimer = todos.filter(todo => todo.withTimer);
 
-    // Вычисление общего времени выполнения всех таймеров
     const totalElapsedTime = todosWithTimer.reduce((total, todo) => total + (todo.elapsedTime || 0), 0);
 
-    // Функция для форматирования времени в формат "часы:минуты"
     const formatTime = (milliseconds: number) => {
-      const hours = Math.floor(milliseconds / 3600000);
-      const minutes = Math.floor((milliseconds % 3600000) / 60000);
-      if (hours === 0) {
-          return `${minutes} мин`;
-      } else {
-          return `${hours} ч ${minutes} мин`;
-      }
-  };
-  
+        const hours = Math.floor(milliseconds / 3600000);
+        const minutes = Math.floor((milliseconds % 3600000) / 60000);
+        if (hours === 0) {
+            return `${minutes} мин`;
+        } else {
+            return `${hours} ч ${minutes} мин`;
+        }
+    };
 
     const [totalTime, setTotalTime] = useState<string>('');
 

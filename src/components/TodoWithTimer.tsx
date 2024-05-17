@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Todo, incrementElapsedTime } from '../redux/slices/todoSlice';
 import { useDrag, DragSourceMonitor } from 'react-dnd';
-import { Popup } from './Popup';
+import { Popup } from './Popup'; 
 
 interface Props {
   todo: Todo;
@@ -17,7 +17,6 @@ const ItemTypes = {
 const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) => {
   const dispatch = useDispatch();
   const [showPopup, setShowPopup] = useState(false);
-  const [localElapsedTime, setLocalElapsedTime] = useState(todo.elapsedTime);
 
   const handleClosePopup = () => {
     setShowPopup(false);
@@ -37,10 +36,6 @@ const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) =
     };
   }, [dispatch, userId, todo]);
 
-  useEffect(() => {
-    setLocalElapsedTime(todo.elapsedTime);
-  }, [todo.elapsedTime]);
-
   const formatTime = (time: number): string => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
@@ -51,7 +46,7 @@ const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) =
     type: ItemTypes.TODO_WITH_TIMER,
     item: { id: todo.id },
     canDrag: () => {      
-      if (localElapsedTime <= 10000) {
+      if (todo.elapsedTime <= 10000) {
         setShowPopup(true);
         return false;
       }
