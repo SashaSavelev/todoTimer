@@ -35,7 +35,7 @@ const TodoInput: React.FC = () => {
 
   const handlePlay = () => {
     if (user && todoText.trim()) {
-      const hasActiveTimer = todos.some((todo) => todo.withTimer && todo.currentlyWorking);
+      const hasActiveTimer = todos ? todos.some((todo) => todo.withTimer && todo.currentlyWorking) : false;
       if (!hasActiveTimer) {
         const newTodo: Todo = {
           id: uuidv4(),
@@ -49,7 +49,7 @@ const TodoInput: React.FC = () => {
         dispatch(addTodo({ userId: user.userId, todo: newTodo }));
         dispatch(incrementElapsedTime({ userId: user.userId, todoId: newTodo.id }));
       } else {
-        setShowPopup(true)       
+        setShowPopup(true);       
       }
       setTodoText('');
     }

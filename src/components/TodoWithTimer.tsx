@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { Todo, incrementElapsedTime } from '../redux/slices/todoSlice';
 import { useDrag, DragSourceMonitor } from 'react-dnd';
-import { Popup } from './Popup'; 
+import { Popup } from './Popup';
 
 interface Props {
   todo: Todo;
@@ -22,6 +22,15 @@ const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) =
     setShowPopup(false);
   };
 
+  const TIMER_FORBIDDEN = 10000;
+
+  const localElapsedTimeRef = useRef(todo.elapsedTime);
+  const [currentTime, setCurrentTime] = useState<number>(Date.now());
+
+  useEffect(() => {
+    localElapsedTimeRef.current = todo.elapsedTime;
+  }, [todo.elapsedTime]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
@@ -36,29 +45,6 @@ const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) =
     };
   }, [dispatch, userId, todo]);
 
-  const formatTime = (time: number): string => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  };
-
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: ItemTypes.TODO_WITH_TIMER,
-    item: { id: todo.id },
-    canDrag: () => {      
-      if (todo.elapsedTime <= 10000) {
-        setShowPopup(true);
-        return false;
-      }
-      return true;
-    },
-    collect: (monitor: DragSourceMonitor) => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }));
-
-  const [currentTime, setCurrentTime] = useState<number>(Date.now());
-
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(Date.now());
@@ -68,6 +54,28 @@ const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) =
       clearInterval(timer);
     };
   }, []);
+
+  const formatTime = (time: number): string => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
+
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: ItemTypes.TODO_WITH_TIMER,
+    item: { id: todo.id },
+    canDrag: () => {
+      if (localElapsedTimeRef.current <= TIMER_FORBIDDEN) {
+        console.log(localElapsedTimeRef.current)
+        setShowPopup(true);
+        return false;
+      }
+      return true;
+    },
+    collect: (monitor: DragSourceMonitor) => ({
+      isDragging: !!monitor.isDragging()
+    })
+  }), [todo.id]);
 
   const startTime = todo.startTime;
   const elapsedTime = startTime ? Math.floor((currentTime - startTime) / 1000) : 0;
