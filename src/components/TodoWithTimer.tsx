@@ -66,7 +66,6 @@ const TodoWithTimer: React.FC<Props> = ({ todo, userId, onCompleteWithTimer }) =
     item: { id: todo.id },
     canDrag: () => {
       if (localElapsedTimeRef.current <= TIMER_FORBIDDEN) {
-        console.log(localElapsedTimeRef.current)
         setShowPopup(true);
         return false;
       }
